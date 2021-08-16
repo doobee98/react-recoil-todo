@@ -3,6 +3,8 @@ import { FaRegCheckSquare, FaRegSquare } from 'react-icons/fa';
 import { ImBin } from 'react-icons/im';
 import styled, { css } from 'styled-components';
 import TodoItemModel, { ChangeTodoItemParams } from 'models/TodoItemModel';
+import { useSetRecoilState } from 'recoil';
+import { todoListState } from 'recoil/todo';
 
 const TodoItemWrapper = styled.div`
   padding: 25px 20px;
@@ -71,24 +73,37 @@ const Content = styled.span<ContentProps>`
 
 interface TodoItemProps {
   todo: TodoItemModel;
-  changeTodo: (id: number, newTodo: ChangeTodoItemParams) => void;
-  deleteTodo: (id: number) => void;
 }
 
 const TodoItem: React.FC<TodoItemProps> = (props) => {
-  const { todo, changeTodo, deleteTodo } = props;
-  const { title, done, pinned } = todo;
+  const { todo } = props;
+  const { id, title, done, pinned } = todo;
+  const setTodoList = useSetRecoilState(todoListState);
+
+  const changeTodo = (newTodo: ChangeTodoItemParams) => {
+    setTodoList((oldTodoList) => ({
+      ...oldTodoList,
+      items: oldTodoList.items.map((todoItem) => ({
+        ...todoItem,
+        ...(todoItem.id === id && newTodo),
+      })),
+    }));
+  };
+
+  const deleteTodo = () => {
+    setTodoList((oldTodoList) => ({
+      ...oldTodoList,
+      counter: oldTodoList.counter - 1,
+      items: oldTodoList.items.filter((todoItem) => todoItem.id !== id),
+    }));
+  };
 
   const toggleDone = () => {
-    changeTodo(todo.id, { done: !todo.done });
+    changeTodo({ done: !todo.done });
   };
 
   const togglePinned = () => {
-    changeTodo(todo.id, { pinned: !todo.pinned });
-  };
-
-  const deleteThis = () => {
-    deleteTodo(todo.id);
+    changeTodo({ pinned: !todo.pinned });
   };
 
   return (
@@ -100,7 +115,7 @@ const TodoItem: React.FC<TodoItemProps> = (props) => {
         {done ? <FaRegCheckSquare /> : <FaRegSquare />}
       </DoneIcon>
       <Content done={done}>{title}</Content>
-      <DeleteIcon onClick={deleteThis}>
+      <DeleteIcon onClick={deleteTodo}>
         <ImBin />
       </DeleteIcon>
     </TodoItemWrapper>

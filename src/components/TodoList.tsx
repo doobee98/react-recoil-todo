@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import TodoItemModel, { ChangeTodoItemParams } from 'models/TodoItemModel';
-import TodoListModel from 'models/TodoListModel';
+import { sortedTodoListState } from 'recoil/todo';
+import { useRecoilValue } from 'recoil';
 import TodoItem from './TodoItem';
 
 const TodoListWrapper = styled.div`
@@ -17,39 +16,16 @@ const EmptyTodoList = styled.div`
   text-align: center;
 `;
 
-interface TodoListProps {
-  todos: TodoListModel;
-  changeTodo: (id: number, newTodo: ChangeTodoItemParams) => void;
-  deleteTodo: (id: number) => void;
-}
-
-const TodoList: React.FC<TodoListProps> = (props) => {
-  const { todos, changeTodo, deleteTodo } = props;
-  const [sortedItems, setSortedItems] = useState<TodoItemModel[]>([]);
-
-  useEffect(() => {
-    setSortedItems(
-      todos.items.sort((a, b) => {
-        // first: pinned, second: bigger id
-        if (a.pinned && !b.pinned) return -1;
-        if (!a.pinned && b.pinned) return 1;
-        return b.id - a.id;
-      }),
-    );
-  }, [todos]);
+const TodoList: React.FC = () => {
+  const sortedTodoList = useRecoilValue(sortedTodoListState);
 
   return (
     <TodoListWrapper>
-      {sortedItems.length === 0 ? (
+      {sortedTodoList.items.length === 0 ? (
         <EmptyTodoList>더이상 할 일이 없습니다...</EmptyTodoList>
       ) : (
-        sortedItems.map((todo) => (
-          <TodoItem
-            key={todo.id}
-            todo={todo}
-            changeTodo={changeTodo}
-            deleteTodo={deleteTodo}
-          />
+        sortedTodoList.items.map((todoItem) => (
+          <TodoItem key={todoItem.id} todo={todoItem} />
         ))
       )}
     </TodoListWrapper>

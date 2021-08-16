@@ -6,16 +6,10 @@ const TodoHeaderWrapper = styled.div`
   margin: 15px auto 40px;
 `;
 
-interface TodoHeaderProps {
-  addNewTodo: (title: string) => void;
-}
-
-const TodoHeader: React.FC<TodoHeaderProps> = (props) => {
-  const { addNewTodo } = props;
-
+const TodoHeader: React.FC = () => {
   return (
     <TodoHeaderWrapper>
-      <TodoNewInput addNewTodo={addNewTodo} />
+      <TodoNewInput />
     </TodoHeaderWrapper>
   );
 };

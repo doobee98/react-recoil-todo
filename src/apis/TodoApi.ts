@@ -10,7 +10,7 @@ class TodoApi {
     3초의 딜레이를 둔 후에 TodoList 데이터를 return하여
     비동기 효과를 낼 수 있도록 디자인
   */
-  fetchTodoList = async (onSuccess: (data: TodoListModel) => void) => {
+  fetchTodoList = async () => {
     await sleep(3000);
 
     const todos: TodoListModel = {
@@ -43,7 +43,7 @@ class TodoApi {
       counter: 4,
     };
 
-    onSuccess(todos);
+    return todos;
   };
 }
 

@@ -1,6 +1,8 @@
 import { FaPlus } from 'react-icons/fa';
 import styled from 'styled-components';
 import useInput from 'hooks/useInput';
+import { useSetRecoilState } from 'recoil';
+import { todoListState } from 'recoil/todo';
 
 const TodoNewInputWrapper = styled.div`
   display: flex;
@@ -27,16 +29,24 @@ const AddIcon = styled.span`
   }
 `;
 
-interface TodoNewInputProps {
-  addNewTodo: (title: string) => void;
-}
-
-const TodoNewInput: React.FC<TodoNewInputProps> = (props) => {
-  const { addNewTodo } = props;
+const TodoNewInput: React.FC = () => {
   const [title, onChangeTitle, setTitle] = useInput();
+  const setTodoList = useSetRecoilState(todoListState);
 
-  const addTodo = () => {
-    addNewTodo(title);
+  const addNewTodo = () => {
+    setTodoList((oldTodoList) => ({
+      counter: oldTodoList.counter + 1,
+      items: [
+        ...oldTodoList.items,
+        {
+          title,
+          id: oldTodoList.counter,
+          done: false,
+          pinned: false,
+        },
+      ],
+    }));
+
     setTitle('');
   };
 
@@ -47,7 +57,7 @@ const TodoNewInput: React.FC<TodoNewInputProps> = (props) => {
         value={title}
         onChange={onChangeTitle}
       />
-      <AddIcon onClick={addTodo}>
+      <AddIcon onClick={addNewTodo}>
         <FaPlus />
       </AddIcon>
     </TodoNewInputWrapper>
